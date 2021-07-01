@@ -5,15 +5,19 @@ _usage(){
 Usage:
   $(basename $0) <root_dir> [<orig_dir>:[<dest_dir>] *] <home_dir> <cmdline>
 
-Example:
-  chroot_start.sh ../common_unprivileged/ubuntu_bionic home:/home/ubuntu etc: /home/ubuntu bash
+Examples:
+  # run bash on the container
+  chroot_start.sh ../common/bionic home:/home/ubu etc: /home/ubu bash
+
+  # same without network access (don't work with with sudo)
+  UNSHARE_OPTS=-n chroot_start.sh ../common/bionic home:/home/ubu etc: /home/ubu bash
   """
   exit 1
 }
 
 if [ `id -u` -gt 0 ] ; then
   which unshare > /dev/null 2>&1 || _usage 
-  unshare -Urfp --mount-proc $0 "$@"
+  unshare -Urfp ${UNSHARE_OPTS:-} --mount-proc $0 "$@"
   exit 0
 fi
 
